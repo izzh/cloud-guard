@@ -134,52 +134,61 @@ func GetConnection(ctx context.Context) (*grpc.ClientConn, error) {
 		case connectivity.Shutdown:
 		}
 	}
-	region, ok := Region.Load().(string)
-	if !ok {
-		return nil, errors.New("no available region")
-	}
+	// region, ok := Region.Load().(string)
+	// if !ok {
+	// 	return nil, errors.New("no available region")
+	// }
 	var err error
-	host, ok := serviceDiscoveryHost[region]
-	if ok {
-		var addrs []string
-		addrs, err = resolveServiceDiscovery(host, 10)
-		if err == nil {
-			for _, addr := range addrs {
-				context, cancel := context.WithTimeout(ctx, dialTimeout)
-				defer cancel()
-				c, err = grpc.DialContext(context, addr, dialOptions...)
-				if err == nil {
-					conn.Store(c)
-					NetMode.Store("sd")
-					atomic.StoreInt32(&retries, 0)
-					return c, nil
-				}
-			}
-		}
+	context, cancel := context.WithTimeout(ctx, dialTimeout)
+	defer cancel()
+	c, err = grpc.DialContext(context, "127.0.0.1:6751", dialOptions...)
+	if err == nil {
+		conn.Store(c)
+		NetMode.Store("public")
+		atomic.StoreInt32(&retries, 0)
+		return c, nil
 	}
-	host, ok = privateHost[region]
-	if ok {
-		context, cancel := context.WithTimeout(ctx, dialTimeout)
-		defer cancel()
-		c, err = grpc.DialContext(context, host, dialOptions...)
-		if err == nil {
-			conn.Store(c)
-			NetMode.Store("private")
-			atomic.StoreInt32(&retries, 0)
-			return c, nil
-		}
-	}
-	host, ok = publicHost[region]
-	if ok {
-		context, cancel := context.WithTimeout(ctx, dialTimeout)
-		defer cancel()
-		c, err = grpc.DialContext(context, host, dialOptions...)
-		if err == nil {
-			conn.Store(c)
-			NetMode.Store("public")
-			atomic.StoreInt32(&retries, 0)
-			return c, nil
-		}
-	}
+	// host, ok := serviceDiscoveryHost[region]
+	// if ok {
+	// 	var addrs []string
+	// 	addrs, err = resolveServiceDiscovery(host, 10)
+	// 	if err == nil {
+	// 		for _, addr := range addrs {
+	// 			context, cancel := context.WithTimeout(ctx, dialTimeout)
+	// 			defer cancel()
+	// 			c, err = grpc.DialContext(context, addr, dialOptions...)
+	// 			if err == nil {
+	// 				conn.Store(c)
+	// 				NetMode.Store("sd")
+	// 				atomic.StoreInt32(&retries, 0)
+	// 				return c, nil
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// host, ok = privateHost[region]
+	// if ok {
+	// 	context, cancel := context.WithTimeout(ctx, dialTimeout)
+	// 	defer cancel()
+	// 	c, err = grpc.DialContext(context, host, dialOptions...)
+	// 	if err == nil {
+	// 		conn.Store(c)
+	// 		NetMode.Store("private")
+	// 		atomic.StoreInt32(&retries, 0)
+	// 		return c, nil
+	// 	}
+	// }
+	// host, ok = publicHost[region]
+	// if ok {
+	// 	context, cancel := context.WithTimeout(ctx, dialTimeout)
+	// 	defer cancel()
+	// 	c, err = grpc.DialContext(context, host, dialOptions...)
+	// 	if err == nil {
+	// 		conn.Store(c)
+	// 		NetMode.Store("public")
+	// 		atomic.StoreInt32(&retries, 0)
+	// 		return c, nil
+	// 	}
+	// }
 	return nil, err
 }

@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/bytedance/Elkeid/server/agent_center/common"
-	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
-	"github.com/bytedance/Elkeid/server/agent_center/grpctrans"
-	"github.com/bytedance/Elkeid/server/agent_center/httptrans"
-	"github.com/bytedance/Elkeid/server/agent_center/svr_registry"
 	"net/http"
 	_ "net/http/pprof"
 	"os/signal"
 	"syscall"
+
+	"github.com/bytedance/Elkeid/server/agent_center/common"
+	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
+	"github.com/bytedance/Elkeid/server/agent_center/grpctrans"
+	"github.com/bytedance/Elkeid/server/agent_center/httptrans"
 )
 
 func init() {
@@ -28,15 +28,15 @@ func main() {
 	go debug()
 
 	//register to service discovery center
-	regGrpc := svr_registry.NewGRPCServerRegistry()
-	defer func() {
-		regGrpc.Stop()
-	}()
+	// regGrpc := svr_registry.NewGRPCServerRegistry()
+	// defer func() {
+	// 	regGrpc.Stop()
+	// }()
 
-	regHttp := svr_registry.NewHttpServerRegistry()
-	defer func() {
-		regHttp.Stop()
-	}()
+	// regHttp := svr_registry.NewHttpServerRegistry()
+	// defer func() {
+	// 	regHttp.Stop()
+	// }()
 
 	<-common.Sig
 }

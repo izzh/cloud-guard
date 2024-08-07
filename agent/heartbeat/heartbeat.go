@@ -60,6 +60,8 @@ func getAgentStat(now time.Time) {
 	// for transfer service
 	rec.Data.Fields["tx_tps"] = strconv.FormatFloat(txTPS, 'f', 8, 64)
 	rec.Data.Fields["rx_tps"] = strconv.FormatFloat(rxTPX, 'f', 8, 64)
+	diskTotal, _ := resource.GetDiskTotal("/")
+	rec.Data.Fields["disk_count"] = strconv.FormatUint(diskTotal, 10)
 	rec.Data.Fields["du"] = strconv.FormatUint(resource.GetDirSize(agent.WorkingDirectory, "plugin"), 10)
 	rec.Data.Fields["ngr"] = strconv.Itoa(runtime.NumGoroutine())
 	rec.Data.Fields["nproc"] = strconv.Itoa(runtime.NumCPU())
@@ -84,6 +86,8 @@ func getAgentStat(now time.Time) {
 		rec.Data.Fields["gateway"] = resource.GetGateway()
 	}
 	rec.Data.Fields["cpu_name"] = resource.GetCPUName()
+	cpuCounts, _ := resource.GetCPUCounts()
+	rec.Data.Fields["cpu_count"] = strconv.FormatInt(int64(cpuCounts), 10)
 	rec.Data.Fields["boot_time"] = strconv.FormatUint(resource.GetBootTime(), 10)
 	if cpuPercents, err := cpu.Percent(0, false); err == nil && len(cpuPercents) != 0 {
 		rec.Data.Fields["cpu_usage"] = strconv.FormatFloat(cpuPercents[0]/100, 'f', 8, 64)
@@ -130,6 +134,27 @@ func getPlgStat(now time.Time) {
 	}
 }
 
+func getNetStat(now time.Time) {
+	if interfaces, err := resource.GetInterfaces(); err == nil {
+		for _, inter := range interfaces {
+			rec := &proto.Record{
+				DataType:  1002,
+				Timestamp: now.Unix(),
+				Data: &proto.Payload{
+					Fields: map[string]string{},
+				},
+			}
+			rec.Data.Fields["eth_name"] = inter.Name
+			rec.Data.Fields["inet"] = inter.Addrs[0].Addr
+			rec.Data.Fields["netmask"] = ""
+			rec.Data.Fields["inet6"] = ""
+			rec.Data.Fields["ether"] = inter.HardwareAddr
+			zap.S().Infof("netStat heartbeat completed:%+v", rec.Data.Fields)
+			buffer.WriteRecord(rec)
+		}
+	}
+}
+
 func Startup(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 	zap.S().Info("health daemon startup")
@@ -145,6 +170,7 @@ func Startup(ctx context.Context, wg *sync.WaitGroup) {
 				host.RefreshHost()
 				getAgentStat(t)
 				getPlgStat(t)
+				getNetStat(t)
 			}
 		}
 	}

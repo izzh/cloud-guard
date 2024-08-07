@@ -1,14 +1,17 @@
 package resource
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
 )
 
@@ -117,6 +120,19 @@ func GetMemTotal() (total uint64) {
 func GetCPUName() string {
 	return cpuName
 }
+func GetCPUCounts() (int, error) {
+	return cpu.Counts(false)
+}
 func GetHostInfo() (serial, id, model, vendor string) {
 	return hostSerial, hostID, hostModel, hostVendor
+}
+func GetDiskTotal(path string) (uint64, error) {
+	if us, err := disk.Usage(path); err == nil {
+		return us.Total, nil
+	}
+	return 0, errors.New("not found")
+}
+
+func GetInterfaces() (net.InterfaceStatList, error) {
+	return net.Interfaces()
 }

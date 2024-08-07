@@ -44,7 +44,7 @@ func init() {
 		WorkingDirectory = "/var/run"
 	}
 	var ok bool
-	if ID, ok = os.LookupEnv("SPECIFIED_AGENT_ID"); ok {
+	if ID, ok = os.LookupEnv("SPECIFIED_AGENT_ID"); ok && ID != "" {
 		return
 	}
 	defer func() {
@@ -74,8 +74,8 @@ func init() {
 			!bytes.Equal(pname, []byte("OEM not specify")) &&
 			!bytes.Equal(bytes.ToLower(pname), []byte("t.b.d")) {
 			ID = uuid.NewSHA1(uuid.NameSpaceOID, source).String()
+			return
 		}
-		return
 	}
 	mid, err := fromUUIDFile("/etc/machine-id")
 	if err == nil {

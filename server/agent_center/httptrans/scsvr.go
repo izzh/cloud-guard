@@ -4,20 +4,21 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common"
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	"github.com/bytedance/Elkeid/server/agent_center/httptrans/http_handler"
 	"github.com/bytedance/Elkeid/server/agent_center/httptrans/midware"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"io/ioutil"
-	"net/http"
-	"os"
 )
 
 func Run() {
 	go runAPIServer(common.HttpPort, common.HttpSSLEnable, common.HttpAuthEnable, common.SSLCertFile, common.SSLKeyFile)
-	runRawDataServer(common.RawDataPort, common.SSLCaFile, common.SSLRawDataCertFile, common.SSLRawDataKeyFile)
+	// runRawDataServer(common.RawDataPort, common.SSLCaFile, common.SSLRawDataCertFile, common.SSLRawDataKeyFile)
 }
 
 func runAPIServer(port int, enableSSL, enableAuth bool, certFile, keyFile string) {
