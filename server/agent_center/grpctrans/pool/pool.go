@@ -3,13 +3,14 @@ package pool
 import (
 	"context"
 	"errors"
+	"math/rand"
+	"sync"
+	"time"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	pb "github.com/bytedance/Elkeid/server/agent_center/grpctrans/proto"
 	"github.com/bytedance/Elkeid/server/agent_center/httptrans/client"
 	"github.com/patrickmn/go-cache"
-	"math/rand"
-	"sync"
-	"time"
 )
 
 type GRPCPool struct {
@@ -43,9 +44,11 @@ type Connection struct {
 	//otherwise, send the command to the agent.
 	CommandChan chan *Command `json:"-"`
 
-	AgentID    string `json:"agent_id"`
-	SourceAddr string `json:"addr"`
-	CreateAt   int64  `json:"create_at"`
+	AgentID        string `json:"agent_id"`
+	TenantAuthCode string `json:"tenant_auth_code"`
+	TenantID       int32  `json:"tenant_id"`
+	SourceAddr     string `json:"addr"`
+	CreateAt       int64  `json:"create_at"`
 
 	agentDetailLock  sync.RWMutex
 	agentDetail      map[string]interface{} `json:"agent_detail"`

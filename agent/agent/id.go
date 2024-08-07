@@ -17,7 +17,9 @@ var (
 	Product             string = "elkeid-agent"
 	Control                    = filepath.Join(WorkingDirectory, "elkeidctl")
 	// from linker
-	Version string
+	Version        string
+	TenantAuthCode = ""
+	TenantID       = -1
 )
 
 func fromUUIDFile(file string) (id uuid.UUID, err error) {
@@ -42,6 +44,10 @@ func fromIDFile(file string) (id []byte, err error) {
 func init() {
 	if WorkingDirectory == "" {
 		WorkingDirectory = "/var/run"
+	}
+	tenantAuthCode, err := fromIDFile("tenant-auth-code")
+	if err == nil {
+		TenantAuthCode = string(tenantAuthCode)
 	}
 	var ok bool
 	if ID, ok = os.LookupEnv("SPECIFIED_AGENT_ID"); ok && ID != "" {

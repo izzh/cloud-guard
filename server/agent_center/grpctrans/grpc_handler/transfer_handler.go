@@ -3,12 +3,13 @@ package grpc_handler
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common"
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	"github.com/bytedance/Elkeid/server/agent_center/grpctrans/pool"
 	pb "github.com/bytedance/Elkeid/server/agent_center/grpctrans/proto"
 	"google.golang.org/grpc/peer"
-	"time"
 )
 
 type TransferHandler struct{}
@@ -42,6 +43,8 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 		return err
 	}
 	agentID := data.AgentID
+	tenantAuthCode := data.TenantAuthCode
+	tenantID := data.TenantID
 
 	//Get the client address
 	p, ok := peer.FromContext(stream.Context())
@@ -56,12 +59,14 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 	ctx, cancelButton := context.WithCancel(context.Background())
 	createAt := time.Now().UnixNano() / (1000 * 1000 * 1000)
 	connection := pool.Connection{
-		AgentID:     agentID,
-		SourceAddr:  addr,
-		CreateAt:    createAt,
-		CommandChan: make(chan *pool.Command),
-		Ctx:         ctx,
-		CancelFuc:   cancelButton,
+		AgentID:        agentID,
+		TenantAuthCode: tenantAuthCode,
+		TenantID:       tenantID,
+		SourceAddr:     addr,
+		CreateAt:       createAt,
+		CommandChan:    make(chan *pool.Command),
+		Ctx:            ctx,
+		CancelFuc:      cancelButton,
 	}
 	ylog.Infof("Transfer", ">>>>now set %s %v", agentID, connection)
 	err = GlobalGRPCPool.Add(agentID, &connection)
