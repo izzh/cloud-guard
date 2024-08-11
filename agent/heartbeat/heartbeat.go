@@ -145,10 +145,22 @@ func getNetStat(now time.Time) {
 					Fields: map[string]string{},
 				},
 			}
+			var netmasks []string
+			var inet []string
+			var inet6 []string
+			for _, addr := range inter.Addrs {
+				netmasks = append(netmasks, addr.Addr)
+				tmpIPs := strings.Split(addr.Addr, "/")
+				if strings.Contains(tmpIPs[0], ".") {
+					inet = append(inet, tmpIPs[0])
+				} else {
+					inet6 = append(inet6, tmpIPs[0])
+				}
+			}
 			rec.Data.Fields["eth_name"] = inter.Name
-			rec.Data.Fields["inet"] = inter.Addrs[0].Addr
-			rec.Data.Fields["netmask"] = ""
-			rec.Data.Fields["inet6"] = ""
+			rec.Data.Fields["inet"] = strings.Join(inet, ",")
+			rec.Data.Fields["netmask"] = strings.Join(netmasks, ",")
+			rec.Data.Fields["inet6"] = strings.Join(inet6, ",")
 			rec.Data.Fields["ether"] = inter.HardwareAddr
 			zap.S().Infof("netStat heartbeat completed:%+v", rec.Data.Fields)
 			buffer.WriteRecord(rec)
