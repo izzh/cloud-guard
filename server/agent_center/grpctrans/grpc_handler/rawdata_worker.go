@@ -3,6 +3,11 @@ package grpc_handler
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common"
 	"github.com/bytedance/Elkeid/server/agent_center/common/kafka"
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
@@ -10,10 +15,6 @@ import (
 	pb "github.com/bytedance/Elkeid/server/agent_center/grpctrans/proto"
 	"github.com/gogo/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
-	"math"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func handleRawData(req *pb.RawData, conn *pool.Connection) (agentID string) {
@@ -66,6 +67,8 @@ func handleRawData(req *pb.RawData, conn *pool.Connection) (agentID string) {
 					metricsAgentHeartBeat(req.AgentID, name, detail)
 				}
 			}
+		case 1002:
+			parseEthInfo(req.GetData()[k], req, conn)
 		case 2001, 2003, 6000, 5100, 5101, 8010:
 			// Asynchronously pushed to the remote end for reconciliation.
 
@@ -212,6 +215,25 @@ func parsePluginHeartBeat(record *pb.Record, req *pb.RawData, conn *pool.Connect
 	detail["last_heartbeat_time"] = time.Now().Unix()
 
 	conn.SetPluginDetail(pluginName, detail)
+	return detail
+}
+
+func parseEthInfo(record *pb.Record, req *pb.RawData, conn *pool.Connection) map[string]interface{} {
+	data, err := parseRecord(record)
+	if err != nil {
+		return nil
+	}
+
+	detail := make(map[string]interface{}, len(data))
+	var ethName string
+	for k, v := range data {
+		if k == "eth_name" {
+			ethName = v
+		}
+		detail[k] = v
+	}
+
+	conn.SetEthInfoDetail(ethName, detail)
 	return detail
 }
 

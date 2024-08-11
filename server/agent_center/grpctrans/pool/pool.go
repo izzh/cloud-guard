@@ -51,10 +51,12 @@ type Connection struct {
 	SourceAddr     string `json:"addr"`
 	CreateAt       int64  `json:"create_at"`
 
-	agentDetailLock  sync.RWMutex
-	agentDetail      map[string]interface{} `json:"agent_detail"`
-	pluginDetailLock sync.RWMutex
-	pluginDetail     map[string]map[string]interface{} `json:"plugin_detail"`
+	agentDetailLock   sync.RWMutex
+	agentDetail       map[string]interface{} `json:"agent_detail"`
+	pluginDetailLock  sync.RWMutex
+	pluginDetail      map[string]map[string]interface{} `json:"plugin_detail"`
+	ethInfoDetailLock sync.RWMutex
+	ethInfoDetail     map[string]map[string]interface{} `json:"ethinfo_detail"`
 }
 
 func (c *Connection) GetAgentDetail() map[string]interface{} {
@@ -98,6 +100,34 @@ func (c *Connection) GetPluginsList() []map[string]interface{} {
 	res := make([]map[string]interface{}, 0, len(c.pluginDetail))
 	for k := range c.pluginDetail {
 		res = append(res, c.pluginDetail[k])
+	}
+	return res
+}
+
+func (c *Connection) GetEthInfoDetail(name string) map[string]interface{} {
+	c.ethInfoDetailLock.Lock()
+	defer c.ethInfoDetailLock.Unlock()
+	if c.ethInfoDetail == nil {
+		return map[string]interface{}{}
+	}
+	return c.ethInfoDetail[name]
+}
+
+func (c *Connection) SetEthInfoDetail(name string, detail map[string]interface{}) {
+	c.ethInfoDetailLock.Lock()
+	defer c.ethInfoDetailLock.Unlock()
+	if c.ethInfoDetail == nil {
+		c.ethInfoDetail = map[string]map[string]interface{}{}
+	}
+	c.ethInfoDetail[name] = detail
+}
+
+func (c *Connection) GetEthInfosList() []map[string]interface{} {
+	c.ethInfoDetailLock.Lock()
+	defer c.ethInfoDetailLock.Unlock()
+	res := make([]map[string]interface{}, 0, len(c.ethInfoDetail))
+	for k := range c.ethInfoDetail {
+		res = append(res, c.ethInfoDetail[k])
 	}
 	return res
 }
