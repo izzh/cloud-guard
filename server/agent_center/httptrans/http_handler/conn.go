@@ -2,6 +2,7 @@ package http_handler
 
 import (
 	"fmt"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	"github.com/bytedance/Elkeid/server/agent_center/grpctrans/grpc_handler"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,7 @@ type ResetRequest struct {
 type ConnStatRsp struct {
 	AgentInfo   map[string]interface{}   `json:"agent_info"`
 	PluginsInfo []map[string]interface{} `json:"plugins_info"`
+	EthsInfo    []map[string]interface{} `json:"eths_info"`
 }
 
 func ConnStat(c *gin.Context) {
@@ -31,6 +33,7 @@ func ConnStat(c *gin.Context) {
 		tmp := ConnStatRsp{
 			AgentInfo:   v.GetAgentDetail(),
 			PluginsInfo: v.GetPluginsList(),
+			EthsInfo:    v.GetEthInfosList(),
 		}
 		resList = append(resList, tmp)
 	}
