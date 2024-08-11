@@ -11,7 +11,7 @@ import (
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	"github.com/gin-gonic/gin"
 	"github.com/levigross/grequests"
-	"k8s.io/apiserver/pkg/apis/audit/v1"
+	v1 "k8s.io/apiserver/pkg/apis/audit/v1"
 )
 
 const (

@@ -5,8 +5,7 @@ manage:
     - 127.0.0.1:6701
 
 manager_server:
-  addr: 127.0.0.1:6701
-
+  addr: 127.0.0.1:8080
 ############################# Service Discovery Settings #############################
 # addrs: addr list of service discovery.
 # name: the name registered to the service discovery, used to uniquely identify the agent_center.
@@ -26,7 +25,7 @@ kafka:
   topic: hids_svr
   rawdata_topic: k8s
   sasl:
-    enable: true
+    enable: false
     username: user
     password: password
   logpath: ./log/sarama.log
@@ -73,11 +72,11 @@ server:
   http:
     port: 6752
     auth:
-      enable: true
+      enable: false
       aksk:
         0376b2a4c481sef5: 60b29se7164027072799f565eb964d91
     ssl:
-      enable: true
+      enable: false
 
   pprof:
     enable: true

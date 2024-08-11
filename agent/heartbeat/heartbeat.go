@@ -137,6 +137,7 @@ func getPlgStat(now time.Time) {
 func getNetStat(now time.Time) {
 	if interfaces, err := resource.GetInterfaces(); err == nil {
 		for _, inter := range interfaces {
+			zap.S().Infof("netStat heartbeat collect info:%+v", inter)
 			rec := &proto.Record{
 				DataType:  1002,
 				Timestamp: now.Unix(),

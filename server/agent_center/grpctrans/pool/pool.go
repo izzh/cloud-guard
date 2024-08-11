@@ -63,6 +63,8 @@ func (c *Connection) GetAgentDetail() map[string]interface{} {
 	if c.agentDetail == nil {
 		return map[string]interface{}{}
 	}
+	c.agentDetail["tenant_id"] = c.TenantID
+	c.agentDetail["host_id"] = c.HostID
 	return c.agentDetail
 }
 
