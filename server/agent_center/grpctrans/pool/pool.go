@@ -47,6 +47,7 @@ type Connection struct {
 	AgentID        string `json:"agent_id"`
 	TenantAuthCode string `json:"tenant_auth_code"`
 	TenantID       int32  `json:"tenant_id"`
+	HostID         int32  `json:"host_id"`
 	SourceAddr     string `json:"addr"`
 	CreateAt       int64  `json:"create_at"`
 
@@ -127,8 +128,8 @@ func NewGRPCPool(config *Config) *GRPCPool {
 	go g.checkTask()
 
 	//Tags
-	go g.loadExtraInfoWorker()
-	go g.refreshExtraInfo(config.Interval)
+	// go g.loadExtraInfoWorker()
+	// go g.refreshExtraInfo(config.Interval)
 	return g
 }
 

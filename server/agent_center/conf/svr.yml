@@ -4,6 +4,9 @@ manage:
   addrs:
     - 127.0.0.1:6701
 
+manager_server:
+  addr: 127.0.0.1:6701
+
 ############################# Service Discovery Settings #############################
 # addrs: addr list of service discovery.
 # name: the name registered to the service discovery, used to uniquely identify the agent_center.

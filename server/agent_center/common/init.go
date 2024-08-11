@@ -3,11 +3,12 @@ package common
 import (
 	"flag"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common/kafka"
 	"github.com/bytedance/Elkeid/server/agent_center/common/userconfig"
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
-	"os"
-	"strings"
 )
 
 func init() {
@@ -51,6 +52,7 @@ func initDefault() {
 	SvrSK = UserConfig.GetString("sd.auth.sk")
 
 	ManageAddrs = UserConfig.GetStringSlice("manage.addrs")
+	ManagerServer = UserConfig.GetString("manager_server.addr")
 
 	GRPCPort = UserConfig.GetInt("server.grpc.port")
 	ConnLimit = UserConfig.GetInt("server.grpc.connlimit")

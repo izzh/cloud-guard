@@ -1,14 +1,19 @@
 package grpc_handler
 
 import (
+	"cloud-guard/server/agent_center/common"
+	"cloud-guard/server/manager/infra/ylog"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/bytedance/Elkeid/server/agent_center/common"
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	"github.com/bytedance/Elkeid/server/agent_center/grpctrans/pool"
 	pb "github.com/bytedance/Elkeid/server/agent_center/grpctrans/proto"
+	"github.com/levigross/grequests"
 	"google.golang.org/grpc/peer"
 )
 
@@ -44,9 +49,19 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 	}
 	agentID := data.AgentID
 	tenantAuthCode := data.TenantAuthCode
-	tenantID := data.TenantID
+	// TODO: /agent/host/connAuth
+	/*
+		{
+		  "tenantAuthCode" : "11ea5588-1813-41c5-b2b4-398c14233f66",
+		  "agentId" : "11ea5588-1813-41c5-b2b4-398c14233f66",
+		  "agentVersion" : "1.1.3",
+		  "extIp": "210.158.1.69"
+		}
+	*/
 
 	//Get the client address
+	var tenantID int32
+	var hostID int32
 	p, ok := peer.FromContext(stream.Context())
 	if !ok {
 		ylog.Errorf("Transfer", "Transfer error %s", err.Error())
@@ -54,6 +69,34 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 	}
 	addr := p.Addr.String()
 	ylog.Infof("Transfer", ">>>>connection addr: %s", addr)
+	authData := make(map[string]string, 1)
+	authData["tenantAuthCode"] = tenantAuthCode
+	authData["agentId"] = agentID
+	authData["agentVersion"] = data.Version
+	authData["extIp"] = addr
+	resp, err := grequests.Post(fmt.Sprintf(common.ManagerServer, "/agent/host/connAuth"), &grequests.RequestOptions{
+		JSON:           authData,
+		RequestTimeout: 5 * time.Second,
+	})
+	if err == nil {
+		respAuthData := &struct {
+			Status int    `json:"status"`
+			Msg    string `json:"msg"`
+			Data   struct {
+				TenantID int32 `json:"tenantId"`
+				HostID   int32 `json:"hostId"`
+			} `json:"data"`
+		}{}
+		if err := json.Unmarshal(resp.Bytes(), respAuthData); err == nil {
+			if respAuthData.Status == 200 {
+				tenantID = respAuthData.Data.TenantID
+				hostID = respAuthData.Data.HostID
+				ylog.Infof("Transfer", ">>>>auth succ %s %s", agentID, tenantAuthCode)
+			} else {
+				ylog.Errorf("Transfer", ">>>>auth fail %s %s", agentID, tenantAuthCode)
+			}
+		}
+	}
 
 	//add connection info to the GlobalGRPCPool
 	ctx, cancelButton := context.WithCancel(context.Background())
@@ -62,6 +105,7 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 		AgentID:        agentID,
 		TenantAuthCode: tenantAuthCode,
 		TenantID:       tenantID,
+		HostID:         hostID,
 		SourceAddr:     addr,
 		CreateAt:       createAt,
 		CommandChan:    make(chan *pool.Command),

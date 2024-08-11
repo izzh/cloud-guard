@@ -1,9 +1,10 @@
 package common
 
 import (
+	"os"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common/kafka"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var (
@@ -40,5 +41,6 @@ var (
 	PProfEnable bool
 	PProfPort   int //pprof
 
-	RawDataPort int
+	RawDataPort   int
+	ManagerServer string
 )

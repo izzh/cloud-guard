@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/bytedance/Elkeid/server/agent_center/common"
 	"github.com/bytedance/Elkeid/server/agent_center/common/ylog"
 	"github.com/gin-gonic/gin"
 	"github.com/levigross/grequests"
-	"k8s.io/apiserver/pkg/apis/audit/v1"
-	"sync"
-	"time"
 )
 
 const (
@@ -68,38 +68,38 @@ var (
 )
 
 func init() {
-	auditLogWriter.Init()
-	go auditLogWriter.Run()
+	// auditLogWriter.Init()
+	// go auditLogWriter.Run()
 
-	clusterMap = &map[string]bool{}
-	ls, err := getClusterIDList()
-	if err != nil {
-		ylog.Errorf("Audit_getClusterIDList", " %s", err.Error())
-	} else {
-		clsMap := map[string]bool{}
-		for _, v := range ls {
-			clsMap[v] = true
-		}
-		clusterMap = &clsMap
-	}
+	// clusterMap = &map[string]bool{}
+	// ls, err := getClusterIDList()
+	// if err != nil {
+	// 	ylog.Errorf("Audit_getClusterIDList", " %s", err.Error())
+	// } else {
+	// 	clsMap := map[string]bool{}
+	// 	for _, v := range ls {
+	// 		clsMap[v] = true
+	// 	}
+	// 	clusterMap = &clsMap
+	// }
 
-	go func() {
-		for {
-			time.Sleep(time.Minute)
-			ls, err := getClusterIDList()
-			if err != nil {
-				ylog.Errorf("Audit_getClusterIDList", " %s", err.Error())
-			} else {
-				clsMap := map[string]bool{}
-				for _, v := range ls {
-					clsMap[v] = true
-				}
-				clusterMap = &clsMap
-			}
-		}
-	}()
+	// go func() {
+	// 	for {
+	// 		time.Sleep(time.Minute)
+	// 		ls, err := getClusterIDList()
+	// 		if err != nil {
+	// 			ylog.Errorf("Audit_getClusterIDList", " %s", err.Error())
+	// 		} else {
+	// 			clsMap := map[string]bool{}
+	// 			for _, v := range ls {
+	// 				clsMap[v] = true
+	// 			}
+	// 			clusterMap = &clsMap
+	// 		}
+	// 	}
+	// }()
 
-	clusterRunningMap = make(map[string]int64, 0)
+	// clusterRunningMap = make(map[string]int64, 0)
 }
 
 func RDAudit(c *gin.Context) {
