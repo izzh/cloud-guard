@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/bytedance/Elkeid/server/agent_center/common"
@@ -72,7 +71,7 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 	authData["agentId"] = agentID
 	authData["agentVersion"] = data.Version
 	authData["extIp"] = addr
-	resp, err := grequests.Post(fmt.Sprintf(common.ManagerServer, "/agent/host/connAuth"), &grequests.RequestOptions{
+	resp, err := grequests.Post(common.ManagerServer+"/agent/host/connAuth", &grequests.RequestOptions{
 		JSON:           authData,
 		RequestTimeout: 5 * time.Second,
 	})

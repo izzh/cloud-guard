@@ -53,7 +53,7 @@ func ReportAgentInfo() {
 					ethsInfo = append(ethsInfo, ethInfo)
 				}
 				data["ethInfo"] = ethsInfo
-				resp, err := grequests.Post(fmt.Sprintf(common.ManagerServer, "/agent/host/heartBeat/basicInfo"), &grequests.RequestOptions{
+				resp, err := grequests.Post(common.ManagerServer+"/agent/host/heartBeat/basicInfo", &grequests.RequestOptions{
 					JSON:           data,
 					RequestTimeout: 5 * time.Second,
 				})
