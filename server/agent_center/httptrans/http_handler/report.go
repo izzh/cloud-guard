@@ -32,10 +32,10 @@ func ReportAgentInfo() {
 				data["os"] = strings.Join([]string{agentInfo["platform"].(string), agentInfo["platform_version"].(string), agentInfo["arch"].(string)}, " ")
 				data["cpuCount"] = agentInfo["cpu_count"]
 				data["cpuName"] = agentInfo["cpu_name"]
-				memSize := float64(agentInfo["total_mem"].(int64)) / 1024 / 1024 / 1024
+				memSize := agentInfo["total_mem"].(float64) / 1024 / 1024 / 1024
 				v1 := fmt.Sprintf("%.2fG", memSize)
 				data["memSize"] = v1
-				diskSize := float64(agentInfo["disk_count"].(int64)) / 1000 / 1000 / 1000
+				diskSize := agentInfo["disk_count"].(float64) / 1000 / 1000 / 1000
 				v2 := fmt.Sprintf("%.2fG", diskSize)
 				data["diskSize"] = v2
 				data["state"] = 1
