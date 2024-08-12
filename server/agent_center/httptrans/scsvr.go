@@ -18,6 +18,7 @@ import (
 
 func Run() {
 	go runAPIServer(common.HttpPort, common.HttpSSLEnable, common.HttpAuthEnable, common.SSLCertFile, common.SSLKeyFile)
+	go http_handler.ReportAgentInfo()
 	// runRawDataServer(common.RawDataPort, common.SSLCaFile, common.SSLRawDataCertFile, common.SSLRawDataKeyFile)
 }
 

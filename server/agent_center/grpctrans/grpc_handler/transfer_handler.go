@@ -94,6 +94,8 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 				ylog.Errorf("Transfer", ">>>>auth fail %s %s", agentID, tenantAuthCode)
 			}
 		}
+	} else {
+		ylog.Errorf("Transfer", ">>>>auth fail %s", err.Error())
 	}
 
 	//add connection info to the GlobalGRPCPool
