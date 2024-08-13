@@ -102,15 +102,16 @@ func handleSend(ctx context.Context, wg *sync.WaitGroup, client proto.Transfer_T
 				recs := buffer.ReadEncodedRecords()
 				if len(recs) != 0 {
 					err := client.Send(&proto.PackagedData{
-						Records:      recs,
-						AgentId:      agent.ID,
-						IntranetIpv4: host.PrivateIPv4.Load().([]string),
-						IntranetIpv6: host.PrivateIPv6.Load().([]string),
-						ExtranetIpv4: host.PublicIPv4.Load().([]string),
-						ExtranetIpv6: host.PublicIPv6.Load().([]string),
-						Hostname:     host.Name.Load().(string),
-						Version:      agent.Version,
-						Product:      agent.Product,
+						Records:        recs,
+						AgentId:        agent.ID,
+						TenantAuthCode: agent.TenantAuthCode,
+						IntranetIpv4:   host.PrivateIPv4.Load().([]string),
+						IntranetIpv6:   host.PrivateIPv6.Load().([]string),
+						ExtranetIpv4:   host.PublicIPv4.Load().([]string),
+						ExtranetIpv6:   host.PublicIPv6.Load().([]string),
+						Hostname:       host.Name.Load().(string),
+						Version:        agent.Version,
+						Product:        agent.Product,
 					})
 					if err != nil {
 						zap.S().Error(err)
