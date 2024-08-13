@@ -76,6 +76,7 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 		RequestTimeout: 5 * time.Second,
 	})
 	if err == nil {
+		ylog.Infof("Auth Resp:%s", string(resp.Bytes()))
 		respAuthData := &struct {
 			Status int    `json:"status"`
 			Msg    string `json:"msg"`
