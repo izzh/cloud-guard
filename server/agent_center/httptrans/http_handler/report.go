@@ -65,8 +65,8 @@ func ReportAgentInfo() {
 						Msg    string `json:"msg"`
 					}{}
 					if err := json.Unmarshal(resp.Bytes(), respData); err == nil {
-						tid := agentInfo["tenant_id"].(int)
-						ylog.Infof("Report tenantID:%s, resp.status:%d, resp.msg:%s", strconv.Itoa(tid), respData.Status, respData.Msg)
+						tid := agentInfo["tenant_id"].(int32)
+						ylog.Infof("Report tenantID:%s, resp.status:%d, resp.msg:%s", strconv.Itoa(int(tid)), respData.Status, respData.Msg)
 					}
 				}
 			}
