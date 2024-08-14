@@ -16,12 +16,15 @@ message MQData{
   string hostname = 9;
   string version = 10;
   string product = 11;
+  string TenantAuthCode = 12;
+  int32 TenantID = 13;
+  int32 HostID = 14;
 
   //server端补全字段
-  int64  time_pkg = 12;
-  string psm_name = 13;
-  string psm_path = 14;
-  string tags = 15;
+  int64  time_pkg = 15;
+  string psm_name = 16;
+  string psm_path = 17;
+  string tags = 18;
 }
 
 message Item{
