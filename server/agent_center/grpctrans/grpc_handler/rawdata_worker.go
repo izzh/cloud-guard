@@ -139,6 +139,8 @@ func parseAgentHeartBeat(record *pb.Record, req *pb.RawData, conn *pool.Connecti
 		}
 	}
 	detail["agent_id"] = req.AgentID
+	detail["tenant_id"] = conn.TenantID
+	detail["host_id"] = conn.HostID
 	detail["agent_addr"] = conn.SourceAddr
 	detail["create_at"] = conn.CreateAt
 	if req.IntranetIPv4 != nil {
