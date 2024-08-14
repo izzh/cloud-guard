@@ -14,6 +14,7 @@ message PackagedData {
   string product = 9;
   string tenant_auth_code = 10;
   int32 tenant_id = 11;
+  int32 host_id = 12;
 }
 
 message EncodedRecord {

@@ -44,6 +44,8 @@ func handleRawData(req *pb.RawData, conn *pool.Connection) (agentID string) {
 		mqMsg.SvrTime = SvrTime
 		mqMsg.PSMName = ""
 		mqMsg.PSMPath = ""
+		mqMsg.TenantID = conn.TenantID
+		mqMsg.HostID = conn.HostID
 		if extraInfo != nil {
 			mqMsg.Tag = extraInfo.Tags
 		} else {

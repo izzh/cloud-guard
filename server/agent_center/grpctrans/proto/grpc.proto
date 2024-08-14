@@ -16,6 +16,7 @@ message RawData{
   string Product = 9;
   string TenantAuthCode = 10;
   int32 TenantID = 11;
+  int32 HostID = 12;
 }
 
 message Record{
@@ -73,12 +74,13 @@ message MQData{
   string Product = 11;
   string TenantAuthCode = 12;
   int32 TenantID = 13;
+  int32 HostID = 14;
 
   //Fields completed on the server
-  int64  SvrTime = 14;
-  string PSMName = 15;    //Used to identify business
-  string PSMPath = 16;    //Used to identify business
-  string Tag = 17;        //Used to identify agent group
+  int64  SvrTime = 15;
+  string PSMName = 16;    //Used to identify business
+  string PSMPath = 17;    //Used to identify business
+  string Tag = 18;        //Used to identify agent group
 }
 
 //bmq --> Rule engine
@@ -97,12 +99,13 @@ message MQRawData{
   string Product = 11;
   string TenantAuthCode = 12;
   int32 TenantID = 13;
+  int32 HostID = 14;
 
   //Fields completed on the server
-  int64  SvrTime = 14;
-  string PSMName = 15;    //Used to identify business
-  string PSMPath = 16;    //Used to identify business
-  string Tags = 17;        //Used to identify agent group
+  int64  SvrTime = 15;
+  string PSMName = 16;    //Used to identify business
+  string PSMPath = 17;    //Used to identify business
+  string Tags = 18;        //Used to identify agent group
 }
 
 service Transfer {
