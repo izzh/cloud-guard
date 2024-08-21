@@ -212,6 +212,26 @@ fn main() {
                             );
                             rec
                         }
+                        Rule::disconnected => {
+                            let mut disconnected = event.into_inner();
+                            debug!("{}", disconnected);
+                            let mut rec = Record::new();
+                            rec.set_data_type(4002);
+                            let fields = rec.mut_data().mut_fields();
+                            fields.insert(
+                                "user".to_owned(),
+                                disconnected.next().unwrap().as_str().to_owned(),
+                            );
+                            fields.insert(
+                                "sip".to_owned(),
+                                disconnected.next().unwrap().as_str().to_owned(),
+                            );
+                            fields.insert(
+                                "sport".to_owned(),
+                                disconnected.next().unwrap().as_str().to_owned(),
+                            );
+                            rec
+                        }
                         _ => {
                             warn!("unknown event type: {}", event);
                             continue;
