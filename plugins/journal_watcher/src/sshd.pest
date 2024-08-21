@@ -10,9 +10,9 @@ extra = @{ ANY* }
 ws = _{ " " }
 // https://github.com/openssh/openssh-portable/blob/master/auth.c#L342
 login = { authenticated ~ ws ~ method ~ ws ~ "for" ~ ws ~ valid ~ user ~ ws ~ "from" ~ ws ~ sip ~ ws ~ "port" ~ ws ~ sport ~ ws ~ "ssh2" ~ (":")? ~ ws? ~ extra  }
-// https://github.com/openssh/openssh-portable/blob/master/gss-serv-krb5.c#L103
-certify = { "Authorized to" ~ ws ~ user ~ ", krb5 principal" ~ ws ~ principal ~ ws ~ "(krb5_kuserok)" }
 // Disconnected from user ubuntu 127.0.0.1 port 64362
 // Disconnected from user root 127.0.0.1 port 50180
-disconnected = { "Disconnected from user" ~ ws ~ user ~ ws ~ sip ~ "port" ~ ws ~ sport ~ ws? ~ extra }
-event = { (login | certify | disconnected) }
+disconnected = { "Disconnected from user" ~ ws ~ user ~ ws ~ sip ~ "port" ~ ws ~ sport ~ extra}
+// https://github.com/openssh/openssh-portable/blob/master/gss-serv-krb5.c#L103
+certify = { "Authorized to" ~ ws ~ user ~ ", krb5 principal" ~ ws ~ principal ~ ws ~ "(krb5_kuserok)" }
+event = { (login | disconnected | certify ) }
