@@ -357,16 +357,11 @@ mod tests {
             "Disconnected from user ubuntu 127.0.0.1 port 6436",
         ) {
             Ok(value) =>  {
-                info!(value)
+                println!("value: {}", value)
             }
             Err(err)  => {
-                error!(err)
+                println!("error: {}", err)
             }
         }
-        // SSHDParser::parse(
-        //     Rule::disconnected,
-        //     "Disconnected from user root 127.0.0.1 port 50180",
-        // )
-        // .unwrap();
     }
 }
