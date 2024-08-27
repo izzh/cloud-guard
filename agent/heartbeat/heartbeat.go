@@ -60,8 +60,11 @@ func getAgentStat(now time.Time) {
 	// for transfer service
 	rec.Data.Fields["tx_tps"] = strconv.FormatFloat(txTPS, 'f', 8, 64)
 	rec.Data.Fields["rx_tps"] = strconv.FormatFloat(rxTPX, 'f', 8, 64)
-	diskTotal, _ := resource.GetDiskTotal("/")
+	diskTotal, diskUsage, _ := resource.GetDiskTotal("/")
 	rec.Data.Fields["disk_count"] = strconv.FormatUint(diskTotal, 10)
+	rec.Data.Fields["disk_usage"] = strconv.FormatFloat(diskUsage, 'f', 8, 64)
+	diskIO := resource.GetDiskIO()
+	rec.Data.Fields["io_rate"] = strconv.FormatInt(int64(diskIO), 10)
 	rec.Data.Fields["du"] = strconv.FormatUint(resource.GetDirSize(agent.WorkingDirectory, "plugin"), 10)
 	rec.Data.Fields["ngr"] = strconv.Itoa(runtime.NumGoroutine())
 	rec.Data.Fields["nproc"] = strconv.Itoa(runtime.NumCPU())
@@ -84,6 +87,13 @@ func getAgentStat(now time.Time) {
 		rec.Data.Fields["host_serial"], rec.Data.Fields["host_id"], rec.Data.Fields["host_model"], rec.Data.Fields["host_vendor"] = resource.GetHostInfo()
 		rec.Data.Fields["dns"] = resource.GetDNS()
 		rec.Data.Fields["gateway"] = resource.GetGateway()
+		tcpCount := resource.GetTCPCount()
+		rec.Data.Fields["tcp_count"] = strconv.Itoa(tcpCount)
+		out, in, err := resource.UploadDownloadFlow("eth0")
+		if err == nil {
+			rec.Data.Fields["exter_net_out"] = strconv.FormatInt(out, 10)
+			rec.Data.Fields["exter_net_in"] = strconv.FormatInt(in, 10)
+		}
 	}
 	rec.Data.Fields["cpu_name"] = resource.GetCPUName()
 	cpuCounts, _ := resource.GetCPUCounts()

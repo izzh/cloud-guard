@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
@@ -126,11 +127,29 @@ func GetCPUCounts() (int, error) {
 func GetHostInfo() (serial, id, model, vendor string) {
 	return hostSerial, hostID, hostModel, hostVendor
 }
-func GetDiskTotal(path string) (uint64, error) {
+func GetDiskTotal(path string) (uint64, float64, error) {
 	if us, err := disk.Usage(path); err == nil {
-		return us.Total, nil
+		return us.Total, us.UsedPercent, nil
 	}
-	return 0, errors.New("not found")
+	return 0, 0.0, errors.New("not found")
+}
+func GetDiskIO() uint64 {
+	disks, err := disk.Partitions(false)
+	if err != nil {
+		return 0
+	}
+	for _, dev := range disks {
+		if strings.Contains(dev.Device, "loop") {
+			continue
+		}
+		stats, err := disk.IOCounters(dev.Device)
+		if err == nil {
+			for _, stat := range stats {
+				return stat.IopsInProgress
+			}
+		}
+	}
+	return 0
 }
 
 func GetInterfaces() (net.InterfaceStatList, error) {
