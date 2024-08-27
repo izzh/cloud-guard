@@ -77,22 +77,22 @@ func GetTCPCount() int {
 type ReceiveBytes uint64
 type TransmitBytes uint64
 
-func UploadDownloadFlow(dev string) (DownloadFlow, UploadFlow, error) {
+func UploadDownloadFlow(dev string) (int64, int64, error) {
 	down, up, err := TotalFlowByDevice(dev)
 	if err != nil {
-		return "", "", err
+		return 0, 0, err
 	}
 	time.Sleep(time.Second * 1)
 
 	down2, up2, err := TotalFlowByDevice(dev)
 	if err != nil {
-		return "", "", err
+		return 0, 0, err
 	}
 
 	downStr := int64(down2 - down)
 	upStr := int64(up2 - up)
 
-	return DownloadFlow(downStr), UploadFlow(upStr), nil
+	return downStr, upStr, nil
 }
 
 func TotalFlowByDevice(dev string) (ReceiveBytes, TransmitBytes, error) {
