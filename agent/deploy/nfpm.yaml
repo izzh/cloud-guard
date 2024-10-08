@@ -12,25 +12,25 @@ description: |
 license: MIT
 contents:
   - src: ./cloud-guard-agent.service
-    dst: /etc/elkeid/cloud-guard-agent.service
+    dst: /etc/cloud-guard/cloud-guard-agent.service
     file_info:
       mode: 0600
       owner: root
       group: root
   - src: ./cloud-guard-agent
-    dst: /etc/elkeid/cloud-guard-agent
+    dst: /etc/cloud-guard/cloud-guard-agent
     file_info:
       mode: 0700
       owner: root
       group: root
   - src: ./scripts/cloud-guard-agent.sysvinit
-    dst: /etc/elkeid/cloud-guard-agent.sysvinit
+    dst: /etc/cloud-guard/cloud-guard-agent.sysvinit
     file_info:
       mode: 0700
       owner: root
       group: root
   - src: ./cloudguardctl
-    dst: /etc/elkeid/cloudguardctl
+    dst: /etc/cloud-guard/cloudguardctl
     file_info:
       mode: 0700
       owner: root
