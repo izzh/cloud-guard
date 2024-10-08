@@ -14,8 +14,8 @@ var (
 	Context, Cancel            = context.WithCancel(context.Background())
 	ID                         = ""
 	WorkingDirectory, _        = os.Getwd()
-	Product             string = "elkeid-agent"
-	Control                    = filepath.Join(WorkingDirectory, "elkeidctl")
+	Product             string = "cloud-guard-agent"
+	Control                    = filepath.Join(WorkingDirectory, "cloudguardctl")
 	// from linker
 	Version        string
 	TenantAuthCode = ""

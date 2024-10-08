@@ -1,11 +1,11 @@
 #!/bin/bash
 #!/usr/bin/env bash
-product_name="elkeid-agent"
-root_dir="/etc/elkeid"
-service_unit="elkeid-agent.service"
-sysvinit_script="elkeid-agent.sysvinit"
+product_name="cloud-guard-agent"
+root_dir="/etc/cloud-guard"
+service_unit="cloud-guard-agent.service"
+sysvinit_script="cloud-guard-agent.sysvinit"
 sysvinit_dir="/etc/init.d/"
-agent_ctl="elkeidctl"
+agent_ctl="cloudguardctl"
 error(){
     echo -e "\e[91m`date "+%Y-%m-%d %H:%M:%S.%3N"`\t[ERRO]\t$1\e[0m"
 }

@@ -50,11 +50,11 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if viper.GetString("service_type") == "sysvinit" {
-			// cleanup /elkeid-agent
-			exec.Command("umount", "/elkeid-agent/cpu").Run()
-			exec.Command("umount", "/elkeid-agent/memory").Run()
-			exec.Command("umount", "/elkeid-agent/named").Run()
-			os.RemoveAll("/elkeid-agent")
+			// cleanup /cloud-guard-agent
+			exec.Command("umount", "/cloud-guard-agent/cpu").Run()
+			exec.Command("umount", "/cloud-guard-agent/memory").Run()
+			exec.Command("umount", "/cloud-guard-agent/named").Run()
+			os.RemoveAll("/cloud-guard-agent")
 			// cleanup invalid process in cgroup
 			cg, err := NewCGroup(serviceName)
 			if err == nil {

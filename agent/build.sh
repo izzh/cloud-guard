@@ -14,9 +14,9 @@ mkdir -p output build
 for arch in amd64 arm64; do
     export GOARCH=${arch}
     cd ${WORKDIR}
-    cd deploy/control && go build -o ../../build/elkeidctl
+    cd deploy/control && go build -ldflags="-w -s -linkmode external -extldflags='-satic'" --tags musl,netgo,osusergo -o ../../build/cloudguardctl
     cd ${WORKDIR}
-    go build -tags product -ldflags "-X ${AGENT_PACKAGE}.Version=${BUILD_VERSION}" -o build/elkeid-agent
+    go build -tags product,musl,netgo,osusergo -ldflags="-w -s -X ${AGENT_PACKAGE}.Version=${BUILD_VERSION} -linkmode external -extldflags='-static'" -o build/cloud-guard-agent
     echo "binary build done."
     cp -r deploy/* build
     cd build
