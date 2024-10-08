@@ -28,10 +28,10 @@ import (
 )
 
 const (
-	serviceName    = "elkeid-agent"
-	agentWorkDir   = "/etc/elkeid/"
-	ctlPidFile     = "/var/run/elkeidctl.pid"
-	crontabContent = "* * * * * root /etc/elkeid/elkeidctl check\n"
+	serviceName    = "cloud-guard-agent"
+	agentWorkDir   = "/etc/cloud-guard/"
+	ctlPidFile     = "/var/run/cloudguardctl.pid"
+	crontabContent = "* * * * * root /etc/cloud-guard/cloudguardctl check\n"
 	agentFile      = agentWorkDir + serviceName
 	cfgFile        = agentWorkDir + "specified_env"
 	serviceFile    = agentWorkDir + serviceName + ".service"
@@ -43,7 +43,7 @@ const (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "elkeidctl",
+	Use:   "cloudguardctl",
 	Short: "A brief description of your application",
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,

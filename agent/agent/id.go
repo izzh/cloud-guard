@@ -14,8 +14,8 @@ var (
 	Context, Cancel            = context.WithCancel(context.Background())
 	ID                         = ""
 	WorkingDirectory, _        = os.Getwd()
-	Product             string = "elkeid-agent"
-	Control                    = filepath.Join(WorkingDirectory, "elkeidctl")
+	Product             string = "cloud-guard-agent"
+	Control                    = filepath.Join(WorkingDirectory, "cloudguardctl")
 	// from linker
 	Version        string
 	TenantAuthCode = ""
@@ -56,6 +56,16 @@ func init() {
 	defer func() {
 		os.WriteFile("machine-id", []byte(ID), 0600)
 	}()
+	mid, err := fromUUIDFile("machine-id")
+	if err == nil {
+		ID = mid.String()
+		return
+	}
+	mid, err = fromUUIDFile("/etc/machine-id")
+	if err == nil {
+		ID = mid.String()
+		return
+	}
 	source := []byte{}
 	isid, err := fromIDFile("/var/lib/cloud/data/instance-id")
 	if err == nil {
@@ -82,11 +92,6 @@ func init() {
 			ID = uuid.NewSHA1(uuid.NameSpaceOID, source).String()
 			return
 		}
-	}
-	mid, err := fromUUIDFile("/etc/machine-id")
-	if err == nil {
-		ID = mid.String()
-		return
 	}
 	if err.Error() == "invalid UUID format" {
 		source, err := fromIDFile("/etc/machine-id")

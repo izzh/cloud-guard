@@ -1,4 +1,4 @@
-name: elkeid-agent
+name: cloud-guard-agent
 arch: amd64
 platform: linux
 epoch: 3
@@ -6,31 +6,31 @@ version: 1.7.0.0
 release: 1
 section: default
 priority: extra
-maintainer: zhanglei <zhanglei.sec@bytedance.com>
+maintainer: ctc
 description: |
-  elkeid-agent
+  cloud-guard-agent
 license: MIT
 contents:
-  - src: ./elkeid-agent.service
-    dst: /etc/elkeid/elkeid-agent.service
+  - src: ./cloud-guard-agent.service
+    dst: /etc/elkeid/cloud-guard-agent.service
     file_info:
       mode: 0600
       owner: root
       group: root
-  - src: ./elkeid-agent
-    dst: /etc/elkeid/elkeid-agent
+  - src: ./cloud-guard-agent
+    dst: /etc/elkeid/cloud-guard-agent
     file_info:
       mode: 0700
       owner: root
       group: root
-  - src: ./scripts/elkeid-agent.sysvinit
-    dst: /etc/elkeid/elkeid-agent.sysvinit
+  - src: ./scripts/cloud-guard-agent.sysvinit
+    dst: /etc/elkeid/cloud-guard-agent.sysvinit
     file_info:
       mode: 0700
       owner: root
       group: root
-  - src: ./elkeidctl
-    dst: /etc/elkeid/elkeidctl
+  - src: ./cloudguardctl
+    dst: /etc/elkeid/cloudguardctl
     file_info:
       mode: 0700
       owner: root

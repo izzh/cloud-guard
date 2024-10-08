@@ -1,11 +1,11 @@
 [Unit]
-Description=elkeid-agent
+Description=cloud-guard-agent
 Wants=network-online.target
 After=network-online.target network.target syslog.target
 [Service]
 Type=simple
-ExecStart=/etc/elkeid/elkeid-agent
-WorkingDirectory=/etc/elkeid
+ExecStart=/etc/cloud-guard/cloud-guard-agent
+WorkingDirectory=/etc/cloud-guard
 Restart=always
 RestartSec=45
 KillMode=control-group
@@ -13,6 +13,6 @@ MemoryMax=250M
 MemoryLimit=250M
 CPUQuota=10%
 Delegate=yes
-EnvironmentFile=-/etc/elkeid/specified_env
+EnvironmentFile=-/etc/cloud-guard/specified_env
 [Install]
 WantedBy=multi-user.target
