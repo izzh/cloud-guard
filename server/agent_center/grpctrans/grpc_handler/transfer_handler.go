@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/bytedance/Elkeid/server/agent_center/common"
@@ -57,8 +58,8 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 	*/
 
 	//Get the client address
-	var tenantID int32
-	var hostID int32
+	var tenantID int64
+	var hostID int64
 	p, ok := peer.FromContext(stream.Context())
 	if !ok {
 		ylog.Errorf("Transfer", "Transfer error %s", err.Error())
@@ -81,19 +82,21 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 			Status int    `json:"status"`
 			Msg    string `json:"msg"`
 			Data   struct {
-				TenantID int32 `json:"tenantId"`
-				HostID   int32 `json:"hostId"`
+				TenantID int64 `json:"tenantId"`
+				HostID   int64 `json:"hostId"`
 			} `json:"data"`
 		}{}
-		if err := json.Unmarshal(resp.Bytes(), respAuthData); err == nil {
+		if err = json.Unmarshal(resp.Bytes(), respAuthData); err == nil {
 			if respAuthData.Status == 200 {
 				tenantID = respAuthData.Data.TenantID
 				hostID = respAuthData.Data.HostID
-				ylog.Infof("Transfer", ">>>>auth succ %s %s", agentID, tenantAuthCode)
+				ylog.Infof("Transfer", ">>>>auth succ %s %s %s %s", agentID, tenantAuthCode, strconv.Itoa(int(tenantID)), strconv.Itoa(int(hostID)))
 			} else {
 				ylog.Errorf("Transfer", ">>>>auth fail %s %s", agentID, tenantAuthCode)
 				return err
 			}
+		} else {
+			ylog.Errorf("Umarshal fail %s", err.Error())
 		}
 	} else {
 		ylog.Errorf("Transfer", ">>>>auth fail %s", err.Error())
@@ -113,6 +116,9 @@ func (h *TransferHandler) Transfer(stream pb.Transfer_TransferServer) error {
 		CommandChan:    make(chan *pool.Command),
 		Ctx:            ctx,
 		CancelFuc:      cancelButton,
+	}
+	if connData, err := json.Marshal(&connection); err == nil {
+		ylog.Infof("connnection data: %s", string(connData))
 	}
 	ylog.Infof("Transfer", ">>>>now set %s %v", agentID, connection)
 	err = GlobalGRPCPool.Add(agentID, &connection)

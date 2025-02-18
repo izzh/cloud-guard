@@ -3,6 +3,7 @@ package http_handler
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -68,8 +69,8 @@ func ReportAgentInfo() {
 					}{}
 					if err := json.Unmarshal(resp.Bytes(), respData); err == nil {
 						tid := agentInfo["tenant_id"].(int32)
-						ylog.Infof("Report tenantID: %d", tid)
-						ylog.Infof("resp.status: %d, resp.msg: %s", respData.Status, respData.Msg)
+						ylog.Infof("Report tenantID: %s", strconv.Itoa(int(tid)))
+						ylog.Infof("resp.status: %s, resp.msg: %s", strconv.Itoa(respData.Status), respData.Msg)
 					}
 				}
 			}
