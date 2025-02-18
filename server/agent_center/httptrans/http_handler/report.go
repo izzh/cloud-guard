@@ -3,7 +3,6 @@ package http_handler
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -20,7 +19,7 @@ func ReportAgentInfo() {
 		select {
 		case <-ticker.C:
 			if !reset {
-				ticker.Reset(60 * time.Minute)
+				ticker.Reset(10 * time.Minute)
 				reset = true
 			}
 			res := grpc_handler.GlobalGRPCPool.GetList()
@@ -53,12 +52,15 @@ func ReportAgentInfo() {
 					ethsInfo = append(ethsInfo, ethInfo)
 				}
 				data["ethInfo"] = ethsInfo
+				if reportData, err := json.Marshal(data); err == nil {
+					ylog.Infof("reportData: %s", string(reportData))
+				}
 				resp, err := grequests.Post(common.ManagerServer+"/agent/host/heartBeat/basicInfo", &grequests.RequestOptions{
 					JSON:           data,
 					RequestTimeout: 5 * time.Second,
 				})
 				if err != nil {
-					ylog.Errorf("Report basicInfo fail, err:%s", err.Error())
+					ylog.Errorf("Report basicInfo fail, err: %s", err.Error())
 				} else {
 					respData := &struct {
 						Status int    `json:"status"`
@@ -66,7 +68,8 @@ func ReportAgentInfo() {
 					}{}
 					if err := json.Unmarshal(resp.Bytes(), respData); err == nil {
 						tid := agentInfo["tenant_id"].(int32)
-						ylog.Infof("Report tenantID:%s, resp.status:%d, resp.msg:%s", strconv.Itoa(int(tid)), respData.Status, respData.Msg)
+						ylog.Infof("Report tenantID: %d", tid)
+						ylog.Infof("resp.status: %d, resp.msg: %s", respData.Status, respData.Msg)
 					}
 				}
 			}
