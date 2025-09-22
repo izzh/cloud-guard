@@ -137,7 +137,7 @@ func ReportAgentInfo() {
 					RequestTimeout: 5 * time.Second,
 				})
 				if err != nil {
-					ylog.Errorf("Report basicInfo fail, err:%s", err.Error())
+					ylog.Errorf("Report basicInfo fail, err: %s", err.Error())
 				} else {
 					respData := &struct {
 						Status int    `json:"status"`
