@@ -46,8 +46,8 @@ type Connection struct {
 
 	AgentID        string `json:"agent_id"`
 	TenantAuthCode string `json:"tenant_auth_code"`
-	TenantID       int32  `json:"tenant_id"`
-	HostID         int32  `json:"host_id"`
+	TenantID       int64  `json:"tenant_id"`
+	HostID         int64  `json:"host_id"`
 	SourceAddr     string `json:"addr"`
 	CreateAt       int64  `json:"create_at"`
 
