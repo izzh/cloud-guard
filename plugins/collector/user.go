@@ -78,6 +78,7 @@ func maskPassword(pwd string) string {
 }
 
 type User struct {
+	Seq                 string `mapstructure:"seq"`
 	Username            string `mapstructure:"username"`
 	Password            string `mapstructure:"password"`
 	Uid                 string `mapstructure:"uid"`
@@ -91,6 +92,15 @@ type User struct {
 	WeakPassword        string `mapstructure:"weak_password"`
 	WeakPasswordContent string `mapstructure:"weak_password_content"`
 	Sudoers             string `mapstructure:"sudoers"`
+	// Shadow file fields
+	ShadowPassword      string `mapstructure:"shadow_password"`      // 密码
+	ShadowLastChange    string `mapstructure:"shadow_last_change"`    // 最后修改日期(自1970-01-01起的天数)
+	ShadowMin           string `mapstructure:"shadow_min"`            // 最小修改间隔天数
+	ShadowMax           string `mapstructure:"shadow_max"`            // 密码有效期天数
+	ShadowWarn          string `mapstructure:"shadow_warn"`           // 密码过期前警告天数
+	ShadowInactive      string `mapstructure:"shadow_inactive"`       // 密码过期后宽限天数
+	ShadowExpire        string `mapstructure:"shadow_expire"`         // 账号失效日期(自1970-01-01起的天数)
+	ShadowFlag          string `mapstructure:"shadow_flag"`           // 保留字段
 }
 
 //go:embed weak_password
@@ -136,6 +146,8 @@ func (h *UserHandler) Handle(c *plugins.Client, cache *engine.Cache, seq string)
 	}
 	m := map[string]*User{}
 	s := bufio.NewScanner(f)
+	currentTime := time.Now().Unix()
+	formattedCurrent := utils.FormatTimestamp(currentTime)
 	for s.Scan() {
 		fields := strings.Split(s.Text(), ":")
 		if len(fields) == 0 {
@@ -146,6 +158,7 @@ func (h *UserHandler) Handle(c *plugins.Client, cache *engine.Cache, seq string)
 			fields = append(fields, "")
 		}
 		u := &User{
+			Seq: formattedCurrent,
 			Username: fields[0],
 			Password: fields[1],
 			Uid:      fields[2],
@@ -189,6 +202,30 @@ func (h *UserHandler) Handle(c *plugins.Client, cache *engine.Cache, seq string)
 					u.WeakPassword, u.WeakPasswordContent = "false", ""
 				} else {
 					u.WeakPassword, u.WeakPasswordContent = verifyWeak(fields[1])
+				}
+				// 按照/etc/shadow文件的字段顺序赋值
+				// 字段顺序: 用户名:加密密码:最后修改日期:最小天数:最大天数:警告天数:不活跃天数:过期日期:保留字段
+				u.ShadowPassword = fields[1]
+				if len(fields) > 2 {
+					u.ShadowLastChange = fields[2]
+				}
+				if len(fields) > 3 {
+					u.ShadowMin = fields[3]
+				}
+				if len(fields) > 4 {
+					u.ShadowMax = fields[4]
+				}
+				if len(fields) > 5 {
+					u.ShadowWarn = fields[5]
+				}
+				if len(fields) > 6 {
+					u.ShadowInactive = fields[6]
+				}
+				if len(fields) > 7 {
+					u.ShadowExpire = fields[7]
+				}
+				if len(fields) > 8 {
+					u.ShadowFlag = fields[8]
 				}
 			}
 		}

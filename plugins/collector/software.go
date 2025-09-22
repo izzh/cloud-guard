@@ -13,6 +13,7 @@ import (
 	"github.com/bytedance/Elkeid/plugins/collector/engine"
 	"github.com/bytedance/Elkeid/plugins/collector/process"
 	"github.com/bytedance/Elkeid/plugins/collector/rpm"
+	"github.com/bytedance/Elkeid/plugins/collector/utils"
 	"github.com/bytedance/Elkeid/plugins/collector/zip"
 	plugins "github.com/bytedance/plugins"
 	mapset "github.com/deckarep/golang-set"
@@ -38,6 +39,7 @@ func (h *SoftwareHandler) DataType() int {
 }
 
 type Software struct {
+	Seq     string `mapstructure:"seq"`
 	Name    string `mapstructure:"name"`
 	Version string `mapstructure:"sversion"`
 	// dpkg rpm pypi jar
@@ -56,8 +58,9 @@ type Software struct {
 	PackageSeq string `mapstructure:"package_seq"`
 }
 
-func parsePypiName(name string) (ret *Software, err error) {
+func parsePypiName(name string, seq string) (ret *Software, err error) {
 	ret = &Software{
+		Seq: seq,
 		Type: "pypi",
 	}
 	n := strings.TrimSuffix(strings.TrimSuffix(name, ".egg-info"), ".dist-info")
@@ -119,6 +122,8 @@ func findJar(c *plugins.Client, rec *plugins.Record, r *zip.Reader, n string) {
 }
 
 func (h *SoftwareHandler) Handle(c *plugins.Client, cache *engine.Cache, seq string) {
+	currentTime := time.Now().Unix()
+        formattedCurrent := utils.FormatTimestamp(currentTime)
 	// scan dpkg
 	if f, err := os.Open("/var/lib/dpkg/status"); err == nil {
 		s := bufio.NewScanner(io.LimitReader(f, 25*1024*1024))
@@ -137,6 +142,7 @@ func (h *SoftwareHandler) Handle(c *plugins.Client, cache *engine.Cache, seq str
 		for s.Scan() {
 			lines := strings.Split(s.Text(), "\n")
 			s := &Software{
+				Seq: formattedCurrent,
 				Type: "dpkg",
 			}
 			for _, line := range lines {
@@ -176,6 +182,7 @@ func (h *SoftwareHandler) Handle(c *plugins.Client, cache *engine.Cache, seq str
 				Timestamp: time.Now().Unix(),
 				Data: &plugins.Payload{
 					Fields: map[string]string{
+						"seq": formattedCurrent,
 						"type":        "rpm",
 						"package_seq": seq,
 						"name":        p.Name,
@@ -205,7 +212,7 @@ func (h *SoftwareHandler) Handle(c *plugins.Client, cache *engine.Cache, seq str
 				}
 			}
 			if strings.HasSuffix(directoryEntry.Name(), ".egg-info") || strings.HasSuffix(directoryEntry.Name(), ".dist-info") {
-				if s, err := parsePypiName(directoryEntry.Name()); err == nil {
+				if s, err := parsePypiName(directoryEntry.Name(), formattedCurrent); err == nil {
 					r := &plugins.Record{
 						DataType:  int32(h.DataType()),
 						Timestamp: time.Now().Unix(),
@@ -226,7 +233,7 @@ func (h *SoftwareHandler) Handle(c *plugins.Client, cache *engine.Cache, seq str
 			FollowSymbolicLinks: false,
 			Callback: func(path string, de *godirwalk.Dirent) error {
 				if strings.HasSuffix(de.Name(), ".egg-info") || strings.HasSuffix(de.Name(), ".dist-info") {
-					if s, err := parsePypiName(de.Name()); err == nil {
+					if s, err := parsePypiName(de.Name(), formattedCurrent); err == nil {
 						r := &plugins.Record{
 							DataType:  int32(h.DataType()),
 							Timestamp: time.Now().Unix(),
@@ -278,6 +285,7 @@ func (h *SoftwareHandler) Handle(c *plugins.Client, cache *engine.Cache, seq str
 				Timestamp: time.Now().Unix(),
 				Data: &plugins.Payload{
 					Fields: map[string]string{
+						"seq": formattedCurrent,
 						"type":           "jar",
 						"psm":            psm,
 						"pod_name":       podName,

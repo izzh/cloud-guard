@@ -37,10 +37,11 @@ func main() {
 
 	e.AddHandler(time.Hour, &ProcessHandler{})
 	e.AddHandler(time.Hour, &PortHandler{})
-	e.AddHandler(time.Hour*6, &UserHandler{})
+	e.AddHandler(time.Hour, &UserHandler{})
 	e.AddHandler(time.Hour*6, &CronHandler{})
 	e.AddHandler(time.Hour*6, &ServiceHandler{})
-	e.AddHandler(engine.BeforeDawn(), &SoftwareHandler{})
+	// e.AddHandler(engine.BeforeDawn(), &SoftwareHandler{})
+	e.AddHandler(time.Hour, &SoftwareHandler{})
 	e.AddHandler(time.Minute*5, &ContainerHandler{})
 	e.AddHandler(engine.BeforeDawn(), &IntegrityHandler{})
 	e.AddHandler(time.Hour*6, &NetInterfaceHandler{})

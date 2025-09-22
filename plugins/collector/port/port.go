@@ -18,6 +18,7 @@ var (
 
 type Port struct {
 	// from inet
+	Seq      string `mapstructure:"seq"`
 	Family   string `mapstructure:"family"`
 	Protocol string `mapstructure:"protocol"`
 	State    string `mapstructure:"state"`
@@ -40,6 +41,8 @@ type Port struct {
 func ListeningPorts() (ret []*Port, err error) {
 	set := mapset.NewSet()
 	pm := map[string]*Port{}
+        currentTime := time.Now().Unix()
+        formattedCurrent := utils.FormatTimestamp(currentTime)
 	for _, proto := range scanProto {
 		sp := strconv.Itoa(int(proto))
 		for _, family := range scanFamily {
@@ -51,6 +54,7 @@ func ListeningPorts() (ret []*Port, err error) {
 			for _, r := range resp {
 				if !set.Contains(r.id.sport) {
 					p := &Port{
+						Seq: formattedCurrent,
 						Family:   strconv.Itoa(int(r.family)),
 						Protocol: sp,
 						State:    strconv.Itoa(int(r.state)),

@@ -53,6 +53,22 @@ type ProcessStat struct {
 	Sid       string `mapstructure:"sid"`
 	StartTime string `mapstructure:"start_time"`
 }
+// ProcessCPU 存储进程的CPU使用信息
+type ProcessCPU struct {
+	Utime      string `mapstructure:"utime"`      // 用户模式下消耗的CPU时间
+	Stime      string `mapstructure:"stime"`      // 系统模式下消耗的CPU时间
+	Cutime     string `mapstructure:"cutime"`     // 所有子进程在用户模式下消耗的CPU时间
+	Cstime     string `mapstructure:"cstime"`     // 所有子进程在系统模式下消耗的CPU时间
+	Priority   string `mapstructure:"priority"`   // 进程优先级
+	Nice       string `mapstructure:"nice"`       // 进程的nice值
+}
+
+// ProcessMem 存储进程的内存使用信息
+type ProcessMem struct {
+	RSS        string `mapstructure:"rss"`        // 常驻内存集大小（单位：字节）
+	RSSLim     string `mapstructure:"rsslim"`     // 进程的RSS限制
+	Vsize      string `mapstructure:"vsize"`      // 虚拟内存大小
+}
 type ProcessStatus struct {
 	Umask      string `mapstructure:"umask"`
 	TracerPid  string `mapstructure:"tcpid"`
@@ -134,6 +150,85 @@ func (p *Process) Stat() (s ProcessStat, err error) {
 		if starttime, err := strconv.ParseInt(string(fields[21]), 10, 64); err == nil {
 			s.StartTime = strconv.FormatInt(starttime/hertz+int64(btime), 10)
 		}
+	}
+	return
+}
+// CPU 返回进程的CPU使用信息
+func (p *Process) CPU() (c ProcessCPU, err error) {
+	var stat []byte
+	stat, err = os.ReadFile(filepath.Join("/proc", p.pid, "stat"))
+	if err != nil {
+		return
+	}
+	fields := bytes.Fields(stat)
+	if len(fields) > 17 {
+		// 获取CPU时间相关字段
+		c.Utime = string(fields[13])  // 第14个字段：用户模式下的CPU时间
+		c.Stime = string(fields[14])  // 第15个字段：系统模式下的CPU时间
+		c.Cutime = string(fields[15]) // 第16个字段：子进程用户模式下的CPU时间
+		c.Cstime = string(fields[16]) // 第17个字段：子进程系统模式下的CPU时间
+		c.Priority = string(fields[17]) // 第18个字段：优先级
+		c.Nice = string(fields[18])   // 第19个字段：nice值
+	}
+	return
+}
+// TotalCPUTime 计算进程占用的总CPU时间（单位：秒）
+// includeChildren: 是否包含子进程的CPU时间
+func (p *Process) TotalCPUTime(includeChildren bool) (totalTime string, err error) {
+	cpuInfo, err := p.CPU()
+	if err != nil {
+		return "", err
+	}
+
+	// 解析用户时间和系统时间
+	utime, err := strconv.ParseInt(cpuInfo.Utime, 10, 64)
+	if err != nil {
+		return "", err
+	}
+	stime, err := strconv.ParseInt(cpuInfo.Stime, 10, 64)
+	if err != nil {
+		return "", err
+	}
+
+	// 计算总CPU时间（时钟滴答数）
+	totalTicks := utime + stime
+
+	// 如果需要包含子进程的CPU时间
+	if includeChildren {
+		cutime, err := strconv.ParseInt(cpuInfo.Cutime, 10, 64)
+		if err != nil {
+			return "", err
+		}
+		cstime, err := strconv.ParseInt(cpuInfo.Cstime, 10, 64)
+		if err != nil {
+			return "", err
+		}
+		totalTicks += cutime + cstime
+	}
+
+	// 转换为秒（时钟滴答数 / 每秒的时钟滴答数）并格式化为字符串
+	timeInSeconds := float64(totalTicks) / float64(hertz)
+	totalTime = strconv.FormatFloat(timeInSeconds, 'f', 6, 64)
+	return totalTime, nil
+}
+
+// Mem 返回进程的内存使用信息
+func (p *Process) Mem() (m ProcessMem, err error) {
+	var stat []byte
+	stat, err = os.ReadFile(filepath.Join("/proc", p.pid, "stat"))
+	if err != nil {
+		return
+	}
+	fields := bytes.Fields(stat)
+	if len(fields) > 23 {
+		// 获取RSS值（单位：页），转换为字节
+		if rssPages, err := strconv.ParseInt(string(fields[22]), 10, 64); err == nil {
+			m.RSS = strconv.FormatInt(rssPages*pageSize, 10)
+		}
+		// 获取虚拟内存大小
+		m.Vsize = string(fields[20])
+		// 获取RSS限制
+		m.RSSLim = string(fields[21])
 	}
 	return
 }
