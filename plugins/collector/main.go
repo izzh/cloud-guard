@@ -35,7 +35,7 @@ func main() {
 	zap.ReplaceGlobals(l)
 	e := engine.New(c, zapr.NewLogger(l))
 
-	e.AddHandler(time.Hour, &ProcessHandler{})
+	e.AddHandler(time.Minute*20, &ProcessHandler{})
 	e.AddHandler(time.Hour, &PortHandler{})
 	e.AddHandler(time.Hour, &UserHandler{})
 	e.AddHandler(time.Hour*6, &CronHandler{})
