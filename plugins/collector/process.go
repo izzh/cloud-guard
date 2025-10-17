@@ -38,8 +38,12 @@ func (h *ProcessHandler) Handle(c *plugins.Client, cache *engine.Cache, seq stri
 			},
 		}
 		rec.Data.Fields["seq"] = formattedCurrent
-		if cpuPercents, err := cpu.Percent(0, false); err == nil && len(cpuPercents) != 0 {
-			rec.Data.Fields["cpu_usage"] = strconv.FormatFloat(cpuPercents[0]/100, 'f', 8, 64)
+		if cpuPercents, err := cpu.Percent(0, true); err == nil && len(cpuPercents) != 0 {
+			cpuV := 0.0
+			for _, v := range cpuPercents {
+				cpuV += v
+			}
+			rec.Data.Fields["cpu_usage"] = strconv.FormatFloat(cpuV/float64(len(cpuPercents))/100, 'f', 8, 64)
 		}
 		if mem, err := mem.VirtualMemory(); err == nil {
 			rec.Data.Fields["mem_usage"] = strconv.FormatFloat(mem.UsedPercent/100, 'f', 8, 64)
