@@ -53,21 +53,22 @@ type ProcessStat struct {
 	Sid       string `mapstructure:"sid"`
 	StartTime string `mapstructure:"start_time"`
 }
+
 // ProcessCPU 存储进程的CPU使用信息
 type ProcessCPU struct {
-	Utime      string `mapstructure:"utime"`      // 用户模式下消耗的CPU时间
-	Stime      string `mapstructure:"stime"`      // 系统模式下消耗的CPU时间
-	Cutime     string `mapstructure:"cutime"`     // 所有子进程在用户模式下消耗的CPU时间
-	Cstime     string `mapstructure:"cstime"`     // 所有子进程在系统模式下消耗的CPU时间
-	Priority   string `mapstructure:"priority"`   // 进程优先级
-	Nice       string `mapstructure:"nice"`       // 进程的nice值
+	Utime    string `mapstructure:"utime"`    // 用户模式下消耗的CPU时间
+	Stime    string `mapstructure:"stime"`    // 系统模式下消耗的CPU时间
+	Cutime   string `mapstructure:"cutime"`   // 所有子进程在用户模式下消耗的CPU时间
+	Cstime   string `mapstructure:"cstime"`   // 所有子进程在系统模式下消耗的CPU时间
+	Priority string `mapstructure:"priority"` // 进程优先级
+	Nice     string `mapstructure:"nice"`     // 进程的nice值
 }
 
 // ProcessMem 存储进程的内存使用信息
 type ProcessMem struct {
-	RSS        string `mapstructure:"rss"`        // 常驻内存集大小（单位：字节）
-	RSSLim     string `mapstructure:"rsslim"`     // 进程的RSS限制
-	Vsize      string `mapstructure:"vsize"`      // 虚拟内存大小
+	RSS    string `mapstructure:"rss"`    // 常驻内存集大小（单位：字节）
+	RSSLim string `mapstructure:"rsslim"` // 进程的RSS限制
+	Vsize  string `mapstructure:"vsize"`  // 虚拟内存大小
 }
 type ProcessStatus struct {
 	Umask      string `mapstructure:"umask"`
@@ -153,6 +154,7 @@ func (p *Process) Stat() (s ProcessStat, err error) {
 	}
 	return
 }
+
 // CPU 返回进程的CPU使用信息
 func (p *Process) CPU() (c ProcessCPU, err error) {
 	var stat []byte
@@ -163,15 +165,16 @@ func (p *Process) CPU() (c ProcessCPU, err error) {
 	fields := bytes.Fields(stat)
 	if len(fields) > 17 {
 		// 获取CPU时间相关字段
-		c.Utime = string(fields[13])  // 第14个字段：用户模式下的CPU时间
-		c.Stime = string(fields[14])  // 第15个字段：系统模式下的CPU时间
-		c.Cutime = string(fields[15]) // 第16个字段：子进程用户模式下的CPU时间
-		c.Cstime = string(fields[16]) // 第17个字段：子进程系统模式下的CPU时间
+		c.Utime = string(fields[13])    // 第14个字段：用户模式下的CPU时间
+		c.Stime = string(fields[14])    // 第15个字段：系统模式下的CPU时间
+		c.Cutime = string(fields[15])   // 第16个字段：子进程用户模式下的CPU时间
+		c.Cstime = string(fields[16])   // 第17个字段：子进程系统模式下的CPU时间
 		c.Priority = string(fields[17]) // 第18个字段：优先级
-		c.Nice = string(fields[18])   // 第19个字段：nice值
+		c.Nice = string(fields[18])     // 第19个字段：nice值
 	}
 	return
 }
+
 // TotalCPUTime 计算进程占用的总CPU时间（单位：秒）
 // includeChildren: 是否包含子进程的CPU时间
 func (p *Process) TotalCPUTime(includeChildren bool) (totalTime string, err error) {
